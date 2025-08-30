@@ -1,0 +1,9 @@
+I don't know if anyone else here is using LWJGL with JavaFX but I've just ran an interesting experiment.
+
+You can't directly bring your OpenGL context into JavaFX because there is no high-level API for it and the backend isn't always OpenGL(ES).
+So there are solutions like DriftFX which will allow you to render FBO's from LWJGL on JavaFX using hardware acceleration if possible.
+
+But these solutions don't always work well and they don't deal with the problem of input forwarding.
+So I wrote some code that embeds that GLFW LWJGL window as a child window in JavaFX and it works great on Windows with virtually no performance overhead.
+
+https://gist.github.com/lenis0012/e9217c3beccbb500c9d402081b7e1c24
