@@ -9,7 +9,49 @@ repositories {
     mavenCentral()
 }
 
+// LWJGL3 platform configuration
+project.ext.lwjglVersion = "3.3.3"
+project.ext.imguiVersion = "1.86.11"
+
+// Platform detection
+project.ext.lwjglNatives = {
+    def osName = System.getProperty("os.name")
+    if (osName.startsWith("Mac")) {
+        return "natives-macos"
+    } else if (osName.startsWith("Windows")) {
+        return "natives-windows"
+    } else if (osName.startsWith("Linux")) {
+        return "natives-linux"
+    } else {
+        throw new Error("Unrecognized or unsupported Operating system. Please set \"lwjglNatives\" manually")
+    }
+}()
+
 dependencies {
+    // LWJGL3 Core
+    implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
+    implementation "org.lwjgl:lwjgl"
+    implementation "org.lwjgl:lwjgl-glfw"
+    implementation "org.lwjgl:lwjgl-opengl"
+    implementation "org.lwjgl:lwjgl-stb"
+
+    // LWJGL3 Natives
+    runtimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-opengl::$lwjglNatives"
+    runtimeOnly "org.lwjgl:lwjgl-stb::$lwjglNatives"
+
+    // ImGui Java binding
+    implementation "io.github.spair:imgui-java-binding:$imguiVersion"
+    implementation "io.github.spair:imgui-java-lwjgl3:$imguiVersion"
+    implementation "io.github.spair:imgui-java-natives-windows:$imguiVersion"
+
+    // JSON processing
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    // File handling
+    implementation 'org.apache.commons:commons-compress:1.24.0'
+
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -17,4 +59,11 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+// JVM arguments for LWJGL
+tasks.withType(JavaExec) {
+    if (System.getProperty("os.name").contains("Mac")) {
+        jvmArgs('-XstartOnFirstThread')
+    }
 }
